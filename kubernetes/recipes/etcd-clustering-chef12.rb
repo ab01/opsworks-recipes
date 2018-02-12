@@ -1,32 +1,17 @@
-chef_version = Chef::VERSION
-major_version = chef_version.split(".")[0]
-
-members = Array.new
-ip_enable_ba = nil
-
-if major_version == "11"
-    node['opsworks']['layers']['etcd']['instances'].each do |inst|
-	    members << inst[0]+"=http://"+inst[1][:private_ip]+":2380"
-	    if ip_enable_ba == nil
-		    ip_enable_ba = inst[1][:private_ip]
-	    end
-    end
-    instance = node['opsworks']['instance']
-
-else #Chef 12
-    search(:node, "name:etcd*").each do |inst|
-        members << inst['hostname']+"=http://"+inst['ipaddress']+":2380"
-        if ip_enable_ba == nil
-            ip_enable_ba = inst['ipaddress']
-        end
-    end
-    instance = search("aws_opsworks_instance", "self:true").first
-
-end
+instance = search("aws_opsworks_instance", "self:true").first
 
 private_ip = instance['private_ip']
 hostname = instance['hostname']
+members = Array.new
+ip_enable_ba = nil
 
+
+search(:node, "name:etcd*").each do |inst|
+	members << inst['hostname']+"=http://"+inst['ipaddress']+":2380"
+	if ip_enable_ba == nil
+		ip_enable_ba = inst['ipaddress']
+	end
+end
 template "/root/etcd_static_bootstrap.sh" do
 	mode "0755"
 	owner "root"
@@ -80,4 +65,3 @@ if private_ip == ip_enable_ba
 	    subscribes :run, "bash[etcd_bootstrap]", :delayed
 	end
 end
-
