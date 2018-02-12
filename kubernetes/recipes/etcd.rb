@@ -19,7 +19,7 @@ bash 'install_etcd' do
         rm -f /usr/local/bin/etcd*
     fi 
   fi
-
+  yum install wget -y
   wget --max-redirect 255 https://github.com/coreos/etcd/releases/download/v#{node['etcd']['version']}/etcd-v#{node['etcd']['version']}-linux-amd64.tar.gz
   tar zxvf etcd-v#{node['etcd']['version']}-linux-amd64.tar.gz
   cd etcd-v#{node['etcd']['version']}-linux-amd64
