@@ -3,6 +3,7 @@ bash 'install_etcd' do
   cwd '/tmp'
   code <<-EOH
   if [ ! -f /usr/local/bin/etcd ]; then
+    yum install wget -y
 	wget --max-redirect 255 https://github.com/coreos/etcd/releases/download/v3.3.0/etcd-v3.3.0-linux-amd64.tar.gz
     tar zxvf etcd-v3.3.0-linux-amd64.tar.gz
     cd etcd-v3.3.0-linux-amd64
